@@ -1,0 +1,53 @@
+---
+title: "KS5 Analysis - Summary of Progress"
+author: Ben Dunn - evaluation@stem.org.uk
+date: "June 2020"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    number_sections: true
+    code_fold: hide
+    css: style.css
+---
+
+<script>
+  $(document).ready(function() {
+    $head = $('#header');
+    $head.prepend('<img src=\"header.jpg\" style=\"float: centre; width: 23cm;\"/>')
+  });
+</script>
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Background
+
+STEM Learning aimed to analyse the impact that engaging with CPD has on STEM A level uptake. The Department for Education publish [statistics](https://www.gov.uk/government/collections/statistics-attainment-at-19-years) on the uptake and attainment of A level subjects amongst 16-19 year olds. STEM Learning have access to their CPD attendance data and can identify schools and colleges who have engaged with our CPD.
+
+This analysis explores the relationship between engagement with STEM Learning's suite of science CPD at the National STEM Learning Centre in York and across the network of Science Learning Partnerships. We propose that engagement with KS3 and KS4 science CPD has a long-term impact on student attainment, aspirations, motivation and ultimately progression within STEM. 
+
+> **We predict that engagement will lead to a higher proportion of students progressing to study STEM A levels compared to non-engaged schools.**
+
+# Engagement & Uptake Data
+
+```{r setup workspace, echo = F, warning = F, message = F}
+library(tidyverse)
+setwd("C:/Users/B.Dunn/OneDrive - STEM Learning Limited/GitHub/KS5 Uptake/KS5_uptake2019")
+engagement_uptake <- read.csv("Engagement_KS5_Uptake.csv")
+```
+
+Our dataset shows schools who have engaged with STEM Learning CPD in the period 01 Aug 2014 to 31 July 2016 and the number of student from their Year 11 GCSE cohort who have progressed to complete at least 1 STEM A level in the periods of summer 2017, 2018 and 2019.
+
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
