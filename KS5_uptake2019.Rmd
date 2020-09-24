@@ -36,7 +36,7 @@ This analysis explores the relationship between engagement with STEM Learning's 
 
 > **We predict that engagement will lead to a higher proportion of students progressing to study STEM A levels compared to non-engaged schools.**
 
-# Engagement & Uptake Data
+# Engagement Data
 
 ```{r setup workspace, echo = F, warning = F, message = F}
 library(tidyverse)
@@ -44,15 +44,46 @@ setwd("C:/Users/B.Dunn/OneDrive - STEM Learning Limited/GitHub/KS5 Uptake/KS5_up
 engagement_uptake <- read.csv("Engagement_KS5_Uptake.csv")
 ```
 
-Our dataset shows schools who have engaged with STEM Learning CPD in the period 01 Aug 2014 to 31 July 2016 and the number of student from their Year 11 GCSE cohort who have progressed to complete at least 1 STEM A level in the periods of summer 2017, 2018 and 2019.
+Our dataset shows schools who have engaged with STEM Learning CPD in the period 01 Aug 2014 to 31 July 2016 and the number of students from their Year 11 GCSE cohort who have progressed to complete at least 1 STEM A level in the periods of summer 2016, 2017, 2018 and 2019.
 
+We can see that 2,107 secondary schools engaged with STEM Learning science CPD over this period, representing approximately 57% of secondary schools.
 
-## Including Plots
+```{r engagement data, echo = F, warning = F, message = F}
+library(kableExtra)
+engaged <- engagement_uptake %>%
+  group_by(engagement_all) %>%
+  summarise(Schools = n()) %>%
+  mutate(Proportion = Schools / sum(Schools))
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+kable(engaged, col.names = c("Engaged?", "Number of Schools", "Proportion")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+# Uptake Data
+
+We can see the number of students who were on roll at the end of GCSE (and therefore potential *could* have taken STEM A levels) and also the number who actually did take at least one STEM A level. This data is shown in the exam periods of June 2016, 2017, 2018 and 2019.
+
+```{r uptake data, echo = F, warning=FALSE, message=FALSE}
+uptake <- engagement_uptake %>% summarise(STEM_2019 = sum(All_1_Alevel_2019),
+                                All_2019 = sum(All_count_2019),
+                                STEM_2018 = sum(All_1_Alevel_2018),
+                                All_2018 = sum(All_count_2018),
+                                STEM_2017 = sum(All_1_Alevel_2017),
+                                All_2017 = sum(All_count_2017),
+                                STEM_2016 = sum(All_1_Alevel_2016),
+                                All_2016 = sum(All_count_2016)) %>%
+  pivot_longer(cols = 1:8, names_to = "Who", values_to = "Students") %>%
+  separate(col = Who, into = c("Who", "Year"), sep = "_") %>%
+  pivot_wider(names_from = "Who", values_from = "Students") %>%
+  arrange(Year) %>%
+  ungroup()
+
+kable(uptake, col.names = c("Year", "Number of Students entering 1+ STEM A level", "Total GCSE Students")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
+
+ggplot(uptake, aes(x = Year, y = STEM)) +
+  geom_point() +
+  geom_line(group = 1)
+```
+
+
