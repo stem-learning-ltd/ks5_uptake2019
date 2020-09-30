@@ -63,7 +63,7 @@ kable(engaged, col.names = c("Engaged?", "Number of Schools", "Proportion")) %>%
 
 We can see the number of students who were on roll at the end of GCSE (and therefore potential *could* have taken STEM A levels) and also the number who actually did take at least one STEM A level. This data is shown in the exam periods of June 2016, 2017, 2018 and 2019.
 
-```{r uptake data, warning=FALSE, message=FALSE}
+```{r uptake data,  warning=FALSE, message=FALSE}
 uptake <- engagement_uptake %>% summarise(STEM_2019 = sum(All_1_Alevel_2019),
                                 All_2019 = sum(All_count_2019),
                                 STEM_2018 = sum(All_1_Alevel_2018),
