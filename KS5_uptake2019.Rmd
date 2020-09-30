@@ -1,5 +1,5 @@
 ---
-title: "KS5 Analysis - Summary of Progress"
+title: "STEM A level Uptake"
 knit: (function(input_file, encoding) {
   out_dir <- 'docs';
   rmarkdown::render(input_file,
@@ -38,7 +38,7 @@ This analysis explores the relationship between engagement with STEM Learning's 
 
 # Engagement Data
 
-```{r setup workspace, echo = F, warning = F, message = F}
+```{r setup workspace, warning = F, message = F}
 library(tidyverse)
 setwd("C:/Users/B.Dunn/OneDrive - STEM Learning Limited/GitHub/KS5 Uptake/KS5_uptake2019")
 engagement_uptake <- read.csv("Engagement_KS5_Uptake.csv")
@@ -48,7 +48,7 @@ Our dataset shows schools who have engaged with STEM Learning CPD in the period 
 
 We can see that 2,107 secondary schools engaged with STEM Learning science CPD over this period, representing approximately 57% of secondary schools.
 
-```{r engagement data, echo = F, warning = F, message = F}
+```{r engagement data, warning = F, message = F}
 library(kableExtra)
 engaged <- engagement_uptake %>%
   group_by(engagement_all) %>%
@@ -63,7 +63,7 @@ kable(engaged, col.names = c("Engaged?", "Number of Schools", "Proportion")) %>%
 
 We can see the number of students who were on roll at the end of GCSE (and therefore potential *could* have taken STEM A levels) and also the number who actually did take at least one STEM A level. This data is shown in the exam periods of June 2016, 2017, 2018 and 2019.
 
-```{r uptake data, echo = F, warning=FALSE, message=FALSE}
+```{r uptake data, warning=FALSE, message=FALSE}
 uptake <- engagement_uptake %>% summarise(STEM_2019 = sum(All_1_Alevel_2019),
                                 All_2019 = sum(All_count_2019),
                                 STEM_2018 = sum(All_1_Alevel_2018),
@@ -76,14 +76,22 @@ uptake <- engagement_uptake %>% summarise(STEM_2019 = sum(All_1_Alevel_2019),
   separate(col = Who, into = c("Who", "Year"), sep = "_") %>%
   pivot_wider(names_from = "Who", values_from = "Students") %>%
   arrange(Year) %>%
+  mutate(Proportion = STEM / All) %>%
   ungroup()
 
-kable(uptake, col.names = c("Year", "Number of Students entering 1+ STEM A level", "Total GCSE Students")) %>%
+kable(uptake, col.names = c("Year", "Number of Students entering 1+ STEM A level", "Total GCSE Students", "% of GCSE students progressing to enter 1+ STEM A level")) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
 
 ggplot(uptake, aes(x = Year, y = STEM)) +
   geom_point() +
-  geom_line(group = 1)
+  geom_line(group = 1) +
+  theme_bw() + 
+  ylab("Number of Students entering at least 1 STEM A level") +
+  geom_text(aes(label=STEM), hjust=20, vjust=0)
 ```
+
+Overall, we can see that the number of students taking at least one STEM A level has increased over the past 4 years. Similarly, the proportion of GCSE students who progress to enter at least one STEM A level has also increased from 14.6% to 18.4%.
+
+# How does engagement with STEM Learning CPD affect uptake?
 
 
