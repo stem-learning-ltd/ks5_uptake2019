@@ -40,6 +40,7 @@ This analysis explores the relationship between engagement with STEM Learning's 
 
 ```{r setup workspace, warning = F, message = F}
 library(tidyverse)
+library(plotly)
 setwd("C:/Users/B.Dunn/OneDrive - STEM Learning Limited/GitHub/KS5 Uptake/KS5_uptake2019")
 engagement_uptake <- read.csv("Engagement_KS5_Uptake.csv")
 ```
@@ -82,12 +83,15 @@ uptake <- engagement_uptake %>% summarise(STEM_2019 = sum(All_1_Alevel_2019),
 kable(uptake, col.names = c("Year", "Number of Students entering 1+ STEM A level", "Total GCSE Students", "% of GCSE students progressing to enter 1+ STEM A level")) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
 
-ggplot(uptake, aes(x = Year, y = STEM)) +
+uptake_plot <- ggplot(uptake, aes(x = Year, y = STEM)) +
   geom_point() +
   geom_line(group = 1) +
   theme_bw() + 
   ylab("Number of Students entering at least 1 STEM A level") +
   geom_text(aes(label=STEM), hjust=20, vjust=0)
+
+uptake_plotly <- ggplotly(uptake_plot)
+uptake_plotly
 ```
 
 Overall, we can see that the number of students taking at least one STEM A level has increased over the past 4 years. Similarly, the proportion of GCSE students who progress to enter at least one STEM A level has also increased from 14.6% to 18.4%.
