@@ -87,8 +87,7 @@ uptake_plot <- ggplot(uptake, aes(x = Year, y = STEM)) +
   geom_point() +
   geom_line(group = 1) +
   theme_bw() + 
-  ylab("Number of Students entering at least 1 STEM A level") +
-  geom_text(aes(label=STEM), hjust=20, vjust=0)
+  ylab("Number of Students entering at least 1 STEM A level")
 
 uptake_plotly <- ggplotly(uptake_plot)
 uptake_plotly
