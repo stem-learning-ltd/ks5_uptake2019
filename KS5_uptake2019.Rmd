@@ -54,9 +54,10 @@ library(kableExtra)
 engaged <- engagement_uptake %>%
   group_by(engagement_all) %>%
   summarise(Schools = n()) %>%
-  mutate(Proportion = Schools / sum(Schools))
+  mutate(Proportion = Schools / sum(Schools)) %>%
+  mutate(Proportion = round(Proportion * 100, 1))
 
-kable(engaged, col.names = c("Engaged?", "Number of Schools", "Proportion")) %>%
+kable(engaged, col.names = c("Engaged?", "Number of Schools", "% of schools")) %>%
   kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
 ```
 
@@ -78,6 +79,7 @@ uptake <- engagement_uptake %>% summarise(STEM_2019 = sum(All_1_Alevel_2019),
   pivot_wider(names_from = "Who", values_from = "Students") %>%
   arrange(Year) %>%
   mutate(Proportion = STEM / All) %>%
+  mutate(Proportion = round(Proportion * 100, 1)) %>%
   ungroup()
 
 kable(uptake, col.names = c("Year", "Number of Students entering 1+ STEM A level", "Total GCSE Students", "% of GCSE students progressing to enter 1+ STEM A level")) %>%
@@ -96,5 +98,144 @@ uptake_plotly
 Overall, we can see that the number of students taking at least one STEM A level has increased over the past 4 years. Similarly, the proportion of GCSE students who progress to enter at least one STEM A level has also increased from 14.6% to 18.4%.
 
 # How does engagement with STEM Learning CPD affect uptake?
+In the period 01 Aug 2014 to 31 July 2016 *2,107 schools* engaged with relevant STEM Learning CPD. This compares to 1,306 schools who did not engage with relevant STEM Learning CPD (although, they may have engaged in other ways). These two groups form our intervention and control groups. We also excluded 287 schools from the sample, who had engaged with relevant STEM Learning CPD outside the period of interest, and therefore may have affected STEM A level uptake.
+
+For both schools engaged with STEM Learning CPD and those non-engaged, we see a year on year increase in the numbers of students progressing to STEM A levels, as shown in the graph below.
+
+```{r summary of engagement figures, warning = F, message = F}
+## Calculate the number of entries
+engagement_summary <- engagement_uptake %>% 
+  filter(engagement_all == 1 | engagement_all == 0 & engaged.pre.either == 0) %>%
+  group_by(engagement_all) %>% 
+  summarise(
+    STEM_Entries_2016 = sum(All_1_Alevel_2016),
+    STEM_Entries_2017 = sum(All_1_Alevel_2017),
+    STEM_Entries_2018 = sum(All_1_Alevel_2018),
+    STEM_Entries_2019 = sum(All_1_Alevel_2019)) %>%
+  pivot_longer(!engagement_all, names_to = "Year", values_to = "Entries") 
+
+engagement_summary$Year <- gsub("STEM_Entries_", "", engagement_summary$Year)
+
+## Calculate the total cohort
+engagement_total <- engagement_uptake %>% 
+  filter(engagement_all == 1 | engagement_all == 0 & engaged.pre.either == 0) %>%
+  group_by(engagement_all) %>% 
+  summarise(
+    Total_2016 = sum(All_count_2016),
+    Total_2017 = sum(All_count_2017),
+    Total_2018 = sum(All_count_2018),
+    Total_2019 = sum(All_count_2019)) %>%
+  pivot_longer(!engagement_all, names_to = "Year", values_to = "Total") 
+
+engagement_total$Year <- gsub("Total_", "", engagement_total$Year)
+
+## Join entries and totals and calculate percentages
+engagement_summary <- left_join(engagement_summary, engagement_total) %>%
+  mutate(Pct_Entries = Entries / Total)
+
+engaged_uptake_plot <- ggplot(engagement_summary, aes(x = Year, y = Entries)) +
+  geom_point() +
+  geom_line(aes(group = engagement_all, colour = as.factor(engagement_all))) +
+  theme_bw() + 
+  ylab("Number of Students entering at least 1 STEM A level")
+
+ggplotly(engaged_uptake_plot)
+
+```
+
+However, we can also present this data as the proportion of total students.
+
+```{r percentages entries, warning = F, message = F}
+engaged_pct_plot <- ggplot(engagement_summary, aes(x = Year, y = Pct_Entries)) +
+  geom_point() +
+  geom_line(aes(group = engagement_all, colour = as.factor(engagement_all))) +
+  theme_bw() + 
+  ylab("Percentage of Students entering at least 1 STEM A level") +
+  geom_text(aes(label = (round(Pct_Entries*100, 1))), position = position_nudge(y = -0.005))
+
+ggplotly(engaged_pct_plot)
+```
+
+The graph suggests that progression to STEM A levels has increased at a similar rate for both engaged and non-engaged schools, however engaged schools start at a much higher baseline in 2016. Further analysis of the data shows that the year-on-year increase for engaged schools is higher than for non-engaged schools, as shown in the table below.
+
+```{r year on year difference, warning = F, message = F}
+## Calculate %s
+pct_diffs <- engagement_summary %>%
+  select(engagement_all, Year, Pct_Entries)
+
+pct_diffs$engagement_all <- gsub("1", "Engaged", pct_diffs$engagement_all)
+pct_diffs$engagement_all <- gsub("0", "Non_Engaged", pct_diffs$engagement_all)
+
+pct_diffs <- pivot_wider(pct_diffs, names_from = engagement_all, values_from = Pct_Entries)
+
+## Then calculate diffs vs. 2016 baseline
+# CDefine 2016 baseline
+Engaged_baseline <- as.double(pct_diffs[1,3])
+NE_baseline <- as.double(pct_diffs[1,2])
+
+# calculate diffs vs baselines
+YonY_diffs <- pct_diffs %>%
+  mutate(Engaged_difference = Engaged - Engaged_baseline,
+         Non_engaged_difference = Non_Engaged - NE_baseline) %>%
+  select(1,2,5,3,4)
+
+YonY_diffs[1,3] <- NA
+YonY_diffs[1,5] <- NA
+
+# Present as a Kable
+
+kable(YonY_diffs,
+      col.names = c("Year",
+                    "% of Students entering 1+ STEM A level, from non-engaged schools", 
+                    "Non-engaged % difference vs. 2016", 
+                    "% of Students entering 1+ STEM A level, from engaged schools",
+                    "Engaged % difference vs. 2016"
+)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
+```
+We can compare the differences for engaged and non-engaged schools to create a difference-in-difference score, with postive numbers showing the extent to which engaged schools progressed versus non-engaged schools.
+
+```{r difference-in-difference}
+Diff_in_diff <- YonY_diffs %>%
+  select(1, 3, 5) %>%
+  filter(Year != 2016) %>%
+  mutate(DinD = Engaged_difference - Non_engaged_difference)
+
+kable(Diff_in_diff,
+      col.names = c("Year",
+                    "Non-engaged % difference vs. 2016", 
+                    "Engaged % difference vs. 2016",
+                    "Difference in difference (engaged - non-engaged)"
+)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
+
+
+```
+We can use these difference in difference scores to estimate the number of additional students progressing to STEM A levels as a result of the school's engagement with STEM Learning CPD. This is done by multiplying the difference-in-difference by the total GCSE cohort from engaged schools. In other words, we estimate how many additional GCSE students progressed to take STEM A levels, who may not have done so if the school did not engage with STEM Learning CPD, adn thus increased at the same rate as non-engaged schools.
+
+```{r calculating student figures}
+
+## Draw in the total GCSE cohort (from above) and then multiply it by diff in diff
+Diff_in_diff2 <- Diff_in_diff %>%
+  select(1, 4) %>%
+  left_join(., filter(engagement_total, engagement_all == 1)) %>%
+  select(-3) %>%
+  mutate(Additional = round(DinD * Total, 0))
+
+kable(Diff_in_diff2,
+      col.names = c("Year",
+                    "Difference in difference (engaged - non-engaged)",
+                    "Total GCSE Students from engaged schools",
+                    "Additional STEM A level students from engaged schools"
+)) %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed"), full_width = F) 
+
+```
+
+# Conclusion
+
+By calculating the difference in progress made by engaged and non-engaged schools, we can estimate the number of additional students from engaged schools who have progressed to enter at least one STEM A level. The above analysis shows that **over 4,500 additional students have progressed to enter STEM A levels as a result of STEM Learning support**.
+
+
 
 
