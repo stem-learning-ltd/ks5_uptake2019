@@ -98,7 +98,7 @@ uptake_plotly
 Overall, we can see that the number of students taking at least one STEM A level has increased over the past 4 years. Similarly, the proportion of GCSE students who progress to enter at least one STEM A level has also increased from 14.6% to 18.4%.
 
 # How does engagement with STEM Learning CPD affect uptake?
-In the period 01 Aug 2014 to 31 July 2016 *2,107 schools* engaged with relevant STEM Learning CPD. This compares to 1,306 schools who did not engage with relevant STEM Learning CPD (although, they may have engaged in other ways). These two groups form our intervention and control groups. We also excluded 287 schools from the sample, who had engaged with relevant STEM Learning CPD outside the period of interest, and therefore may have affected STEM A level uptake.
+In the period 01 Aug 2014 to 31 July 2016 **2,107 schools** engaged with relevant STEM Learning CPD. This compares to 1,306 schools who did not engage with relevant STEM Learning CPD (although, they may have engaged in other ways). These two groups form our intervention and control groups. We also excluded 287 schools from the sample, who had engaged with relevant STEM Learning CPD outside the period of interest, and therefore may have affected STEM A level uptake.
 
 For both schools engaged with STEM Learning CPD and those non-engaged, we see a year on year increase in the numbers of students progressing to STEM A levels, as shown in the graph below.
 
